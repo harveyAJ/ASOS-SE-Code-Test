@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
+using App.Models;
 
-namespace App
+namespace App.Repository
 {
-    public class CompanyRepository
+    public class CompanyRepository : IRepository<Company>
     {
+        public void Add(Company company)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public Company GetById(int id)
         {
             Company company = null;
@@ -32,11 +34,11 @@ namespace App
                 while (reader.Read())
                 {
                     company = new Company
-                                      {
-                                          Id = int.Parse(reader["CompanyId"].ToString()),
-                                          Name = reader["Name"].ToString(),
-                                          Classification = (Classification)int.Parse(reader["ClassificationId"].ToString())
-                                      };
+                    {
+                        Id = int.Parse(reader["CompanyId"].ToString()),
+                        Name = reader["Name"].ToString(),
+                        Classification = (Classification)int.Parse(reader["ClassificationId"].ToString())
+                    };
                 }
             }
 

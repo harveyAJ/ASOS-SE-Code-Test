@@ -1,13 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
+using App.Models;
 
-namespace App
+namespace App.Repository
 {
+    public class CustomerRepository : IRepository<Customer>
+    {
+        private static readonly object obj = new object();
+
+        public void Add(Customer customer)
+        {
+            lock (obj)
+            {
+                CustomerDataAccess.AddCustomer(customer);
+            }
+        }
+
+        public Customer GetById(int id)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
+
     public static class CustomerDataAccess
     {
         public static void AddCustomer(Customer customer)

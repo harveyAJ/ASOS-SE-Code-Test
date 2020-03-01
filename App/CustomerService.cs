@@ -1,79 +1,83 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using App.BusinessRules;
+using App.Models;
+using App.Repository;
+using App.Validation;
 
 namespace App
 {
     public class CustomerService
     {
-        public bool AddCustomer(string firname, string surname, string email, DateTime dateOfBirth, int companyId)
+        private readonly IRepository<Customer> _customerRepository;
+        private readonly IRepository<Company> _companyRepository;
+        private readonly ICreditCheckRule _creditCheckRule;
+        private readonly IValidator<Customer> _customerValidator;
+
+        public CustomerService()
         {
-            if (string.IsNullOrEmpty(firname) || string.IsNullOrEmpty(surname))
-            {
-                return false;
-            }
+            //I am having this constructor here to maintain backward compatibility
+            //I add the second constructor to have a customer service
+            //I am aware that by adding this constructor, I am breaking the dependency injection principle
+            _customerRepository = new CustomerRepository();
+            _companyRepository = new CompanyRepository();
+            _creditCheckRule = new CreditCheckRule(new CustomerCreditServiceClient(), _companyRepository);
+            _customerValidator = new CustomerValidator();
+        }
 
-            if (!email.Contains("@") && !email.Contains("."))
-            {
-                return false;
-            }
+        public CustomerService(IRepository<Customer> customerRepository, 
+            IRepository<Company> companyRepository, 
+            ICreditCheckRule creditCheckRule, 
+            IValidator<Customer> customerValidator)
+        {
+            _customerRepository = customerRepository;
+            _companyRepository = companyRepository;
+            _creditCheckRule = creditCheckRule;
+            _customerValidator = customerValidator;
+        }
 
-            var now = DateTime.Now;
-            int age = now.Year - dateOfBirth.Year;
-            if (now.Month < dateOfBirth.Month || (now.Month == dateOfBirth.Month && now.Day < dateOfBirth.Day)) age--;
-
-            if (age < 21)
-            {
-                return false;
-            }
-
-            var companyRepository = new CompanyRepository();
-            var company = companyRepository.GetById(companyId);
-
+        public bool AddCustomer(string firstName, string surname, string email, DateTime dateOfBirth, int companyId)
+        {
             var customer = new Customer
-                               {
-                                   Company = company,
-                                   DateOfBirth = dateOfBirth,
-                                   EmailAddress = email,
-                                   Firstname = firname,
-                                   Surname = surname
-                               };
+            {
+                Firstname = firstName,
+                Surname = surname,
+                EmailAddress = email,
+                DateOfBirth = dateOfBirth
+            };
 
-            if (company.Name == "VeryImportantClient")
-            {
-                // Skip credit check
-                customer.HasCreditLimit = false;
-            }
-            else if (company.Name == "ImportantClient")
-            {
-                // Do credit check and double credit limit
-                customer.HasCreditLimit = true;
-                using (var customerCreditService = new CustomerCreditServiceClient())
-                {
-                    var creditLimit = customerCreditService.GetCreditLimit(customer.Firstname, customer.Surname, customer.DateOfBirth);
-                    creditLimit = creditLimit*2;
-                    customer.CreditLimit = creditLimit;
-                }
-            }
-            else
-            {
-                // Do credit check
-                customer.HasCreditLimit = true;
-                using (var customerCreditService = new CustomerCreditServiceClient())
-                {
-                    var creditLimit = customerCreditService.GetCreditLimit(customer.Firstname, customer.Surname, customer.DateOfBirth);
-                    customer.CreditLimit = creditLimit;
-                }
-            }
-
-            if (customer.HasCreditLimit && customer.CreditLimit < 500)
+            if (!_customerValidator.Validate(customer))
             {
                 return false;
             }
 
-            CustomerDataAccess.AddCustomer(customer);
+            var company = _companyRepository.GetById(companyId);
 
+            if (company == null)
+            {
+                return false;
+            }
+
+            customer.Company = company;
+
+            var status = _creditCheckRule.Apply(customer);
+
+            if (status.Failed)
+            {
+                return false;
+            }
+
+            customer.HasCreditLimit = status.HasCreditLimit;
+            customer.CreditLimit = status.CreditLimit;
+
+            try
+            {
+                _customerRepository.Add(customer);
+            }
+            catch
+            {
+                return false;
+            }
+            
             return true;
         }
     }

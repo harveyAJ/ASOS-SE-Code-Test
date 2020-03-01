@@ -8,7 +8,7 @@ namespace Harness
         public static void ProveAddCustomer(string[] args)
         {
 
-        	/*
+            /*
 			 *	You MUST NOT change this code. This is an existing consumer of the CustomerService and you must maintain
 			 *  backwards compatibility.
         	*/
