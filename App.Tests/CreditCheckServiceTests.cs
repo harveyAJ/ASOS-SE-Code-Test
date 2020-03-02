@@ -7,9 +7,6 @@ using Moq;
 
 namespace App.Tests
 {
-    /// <summary>
-    /// Summary description for CreditCheckServiceCheck
-    /// </summary>
     [TestClass]
     public class CreditCheckServiceTests
     {
@@ -30,10 +27,10 @@ namespace App.Tests
             companyMock.Object.Name = "SocGen";
 
             var companyRepositoryMock = new Mock<IRepository<Company>>();
-            companyRepositoryMock.Setup(m => m.GetById(7)).Returns(companyMock.Object);
+            companyRepositoryMock.Setup(x => x.GetById(7)).Returns(companyMock.Object);
 
             var creditServiceMock = new Mock<ICustomerCreditService>();
-            creditServiceMock.Setup(m => m.GetCreditLimit(customer.Firstname, customer.Surname, customer.DateOfBirth)).Returns(499);
+            creditServiceMock.Setup(x => x.GetCreditLimit(customer.Firstname, customer.Surname, customer.DateOfBirth)).Returns(499);
 
             var creditCheckService = new CreditCheckRule(creditServiceMock.Object, companyRepositoryMock.Object);
 
@@ -61,10 +58,10 @@ namespace App.Tests
             companyMock.Object.Name = "Moolah Corp.";
 
             var companyRepositoryMock = new Mock<IRepository<Company>>();
-            companyRepositoryMock.Setup(m => m.GetById(1)).Returns(companyMock.Object);
+            companyRepositoryMock.Setup(x => x.GetById(1)).Returns(companyMock.Object);
 
             var creditServiceMock = new Mock<ICustomerCreditService>();
-            creditServiceMock.Setup(m => m.GetCreditLimit(customer.Firstname, customer.Surname, customer.DateOfBirth)).Returns(10000);
+            creditServiceMock.Setup(x => x.GetCreditLimit(customer.Firstname, customer.Surname, customer.DateOfBirth)).Returns(10000);
 
             var creditCheckService = new CreditCheckRule(creditServiceMock.Object, companyRepositoryMock.Object);
 
@@ -92,10 +89,10 @@ namespace App.Tests
             companyMock.Object.Name = "VeryImportantClient";
 
             var companyRepositoryMock = new Mock<IRepository<Company>>();
-            companyRepositoryMock.Setup(m => m.GetById(2)).Returns(companyMock.Object);
+            companyRepositoryMock.Setup(x => x.GetById(2)).Returns(companyMock.Object);
 
             var creditServiceMock = new Mock<ICustomerCreditService>();
-            creditServiceMock.Setup(m => m.GetCreditLimit(customer.Firstname, customer.Surname, customer.DateOfBirth)).Returns(10000);
+            creditServiceMock.Setup(x => x.GetCreditLimit(customer.Firstname, customer.Surname, customer.DateOfBirth)).Returns(10000);
 
             var creditCheckService = new CreditCheckRule(creditServiceMock.Object, companyRepositoryMock.Object);
 
@@ -122,10 +119,10 @@ namespace App.Tests
             companyMock.Object.Name = "ImportantClient";
 
             var companyRepositoryMock = new Mock<IRepository<Company>>();
-            companyRepositoryMock.Setup(m => m.GetById(5)).Returns(companyMock.Object);
+            companyRepositoryMock.Setup(x => x.GetById(5)).Returns(companyMock.Object);
 
             var creditServiceMock = new Mock<ICustomerCreditService>();
-            creditServiceMock.Setup(m => m.GetCreditLimit(customer.Firstname, customer.Surname, customer.DateOfBirth)).Returns(300);
+            creditServiceMock.Setup(x => x.GetCreditLimit(customer.Firstname, customer.Surname, customer.DateOfBirth)).Returns(300);
 
             var creditCheckService = new CreditCheckRule(creditServiceMock.Object, companyRepositoryMock.Object);
 
