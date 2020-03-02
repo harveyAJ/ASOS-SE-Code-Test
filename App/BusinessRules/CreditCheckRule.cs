@@ -42,7 +42,7 @@ namespace App.BusinessRules
                 creditStatus.CreditLimit = creditLimit;
             }
 
-            if (creditStatus.HasCreditLimit && creditStatus.CreditLimit < 500)
+            if (creditStatus.HasCreditLimit && creditStatus.CreditLimit < _creditLimit)
             {
                 creditStatus.Failed = true;
             }

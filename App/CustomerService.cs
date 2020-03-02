@@ -15,9 +15,10 @@ namespace App
 
         public CustomerService()
         {
-            //I am having this constructor here to maintain backward compatibility
-            //I add the second constructor to have a customer service
-            //I am aware that by adding this constructor, I am breaking the dependency injection principle
+            //I am having this constructor here to maintain backward compatibility with previous consumer of the service.
+            //Another option (cleaner) would have been to wrap my new CustomerService (named differently) into the 
+            //original CustomerService
+            //Obviously, by having this default constructor, I am breaking the dependency injection principle...
             _customerRepository = new CustomerRepository();
             _companyRepository = new CompanyRepository();
             _creditCheckRule = new CreditCheckRule(new CustomerCreditServiceClient(), _companyRepository);
